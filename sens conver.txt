@@ -1,0 +1,94 @@
+#ADDING A NEW ROW INTO THE DATABASE
+import sqlite3
+
+conn = sqlite3.connect("sens.db")
+cursor = conn.cursor()
+
+cursor.execute("""
+INSERT INTO sensitivities (game, yaw)
+VALUES (?, ?)
+""", ("overwatch2", 0.0066))
+
+conn.commit()
+conn.close()
+
+#CAN BE DONE WITH A LOOP AS WELL
+import sqlite3
+
+users = [
+    (valorant", 0.07),
+    ("cs2", 0.022),
+    ("overwatch2", 0.0066)
+]
+
+conn = sqlite3.connect("sens.db")
+cursor = conn.cursor()
+
+cursor.executemany("""
+INSERT INTO sensitivities (game, yaw)
+VALUES (?, ?)
+""", users)
+
+conn.commit()
+conn.close()
+
+#ACTUAL FORMULAE BEFORE MAKING DATABASE (FIRST PROTOTYPE TESTING 3 GAMES)
+
+games = {
+    "valorant": 0.07,
+    "cs2": 0.022,
+    "overwatch2": 0.0066
+}
+
+
+def convert_sens(old_sens, old_game, new_game,
+                 old_dpi, new_dpi):
+
+    old_yaw = games[old_game]
+    new_yaw = games[new_game]
+
+    new_sens = (
+        old_sens * old_yaw * old_dpi) / (new_yaw * new_dpi)
+
+    return round(new_sens, 3)
+
+
+print("=== Sensitivity Converter ===")
+print()
+
+print("Supported games:")
+for game in games:
+    print(f"- {game}")
+
+print()
+
+# User input
+old_game = input("Convert FROM: ").lower()
+new_game = input("Convert TO: ").lower()
+
+old_sens = float(input("Current sensitivity: "))
+
+old_dpi = int(input("Current DPI: "))
+new_dpi = int(input("New DPI: "))
+
+# Validation
+if old_game not in games:
+    print("Invalid source game.")
+    exit()
+
+if new_game not in games:
+    print("Invalid target game.")
+    exit()
+
+# Conversion
+result = convert_sens(
+    old_sens,
+    old_game,
+    new_game,
+    old_dpi,
+    new_dpi
+)
+
+print()
+print("=== Result ===")
+print(result)
